@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f8f9fa; }
+        .form-container { max-width: 400px; margin: 40px auto; padding: 25px; background: white; border: 1px solid #dee2e6; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
+        button:hover { background-color: #0056b3; }
+        #responseMessage { margin-top: 20px; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Submit Data</h2>
+    <form id="dataForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="responseMessage"></div>
+</div>
+
+<script>
+document.getElementById('dataForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        message: document.getElementById('message').value
+    };
+
+    try {
+        const response = await fetch('/submit', {   // ✅ FIXED
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        const messageEl = document.getElementById('responseMessage');
+        
+        if (response.ok) {
+            messageEl.innerText = result.message || 'Data submitted successfully!';
+            messageEl.style.color = '#28a745';
+            document.getElementById('dataForm').reset();
+        } else {
+            messageEl.innerText = result.error || 'Server error occurred.';
+            messageEl.style.color = '#dc3545';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        const messageEl = document.getElementById('responseMessage');
+        messageEl.innerText = 'Error connecting to the server.';
+        messageEl.style.color = '#dc3545';
+    }
+});
+</script>
+
+</body>
+</html>
